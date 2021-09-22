@@ -17,7 +17,7 @@ HEADERS =
 
 # コンパイラの設定
 CC = i686-pc-cygwin-gcc
-CCFLAGS = -Wall -I/usr/include/opengi
+CCFLAGS = -Wall -I/usr/include/opengl
 LD = i686-pc-cygwin-gcc
 LDFLAGS =
 # MATH LIB setting
