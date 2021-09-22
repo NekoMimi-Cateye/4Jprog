@@ -14,7 +14,12 @@ int main(void)
     // time構造体の内部確認
     while(1)
     {
+        // 更新テスト
+        time(&t2);
+        pt2 = localtime(&t2);
+
         // config
-        printf("\rpt1 -> tm_sec :: %d", pt1 -> tm_sec);
+        printf("\rpt1 -> tm_sec :: %d  ", pt1 -> tm_sec);
+        printf("pt2 -> tm_sec :: %d    ",   pt2 -> tm_sec);
     }
 }
