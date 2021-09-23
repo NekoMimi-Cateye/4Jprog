@@ -10,6 +10,9 @@ int main(int argc, char **argv)
     glutInitWindowSize(320, 240);
     glutCreateWindow("サンプルその１");
     glutDisplayFunc(Display);
+    glutInitDisplayMode(GLUT_RGBA);
+    glClearColor(0.0, 0.0, 1.0, 1.0);
+
     glutMainLoop();
 
     return(0);
@@ -22,5 +25,6 @@ int main(int argc, char **argv)
 //
 void Display(void)
 {
-    // とりあえず何もしない
+    glClear(GL_COLOR_BUFFER_BIT);
+    glFlush();
 }
