@@ -141,7 +141,6 @@ void Display(void)
 //
 void Reshape(int w, int h)
 {
-    printf("ウインドウの幅と高さ :: %dx%d\n", w, h);
     glViewport(0, 0, w, h);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
