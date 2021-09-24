@@ -13,12 +13,12 @@ int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitWindowSize(400, 400);
-    glutCreateWindow("サンプルその１");
+    glutCreateWindow("Analog Clock");
     glutDisplayFunc(Display);
     glutReshapeFunc(Reshape);
     glutInitDisplayMode(GLUT_RGBA);
     glutTimerFunc(500, Timer, 0);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(0.7, 1.0, 1.0, 1.0);
     glutMainLoop();
 
     return(0);
@@ -50,15 +50,10 @@ void Display(void)
     // 中心点計算
     int xc = glutGet(GLUT_WINDOW_WIDTH) / 2;
     int yc = glutGet(GLUT_WINDOW_HEIGHT) / 2;
-    // 中心点描画
-    glPointSize(10.0);
-    glBegin(GL_POINTS);
-        glColor3ub(255, 255, 255);
-        glVertex2i(xc, yc);
-    glEnd();
+
     // 時計のフレーム作成
     // 正葉曲線の係数
-    double k = 0.8;
+    double k = 0.7;
     double fr;
     // フレーム半径
     if (xc < yc)
@@ -66,17 +61,64 @@ void Display(void)
     else
         fr = (double)yc * 0.85;
     // フレーム描画
-    glPointSize(1.0);
+    glBegin(GL_TRIANGLE_FAN);
+        glColor3ub(0, 0, 0);
+        glVertex2i(xc, yc);
+        for (double deg=0; deg<360.0; deg+=0.1)
+        {
+            double rad = M_PI * deg / 180.0;
+            int x = (int)(cos(rad) * fr) + xc;
+            int y = (int)(sin(rad) * fr) + yc;
+            glVertex2i(x, y);
+        }
+    glEnd();
+
+    // フレーム装飾
+    glPointSize(3.0);
     glBegin(GL_POINTS);
         for (double deg=0; deg<1800.0; deg+=0.1)
         {
-            double drad = M_PI * (double)(p_curt -> tm_sec) / 30.0;
             double rad = M_PI * deg / 180.0;
             double r = fr * sin(rad * k);
 
-            int x = (int)(cos(rad-drad) * r) + xc;
-            int y = (int)(sin(rad-drad) * r) + yc;
+            int x = (int)(cos(rad) * r) + xc;
+            int y = (int)(sin(rad) * r) + yc;
+            double ddeg = 1800.0 * (double)(p_curt->tm_sec) / 60.0;
+            
+            double fcc = (double)((int)(deg+ddeg) % 1800);
+            int fcr, fcg, fcb;
+            if (fcc <= 600)
+            {
+                fcr = (int)(fcc * 255.0 / 600.0);
+                fcg = (int)((600.0 - fcc) * 255.0 / 600.0);
+                fcb = 0;
+            }
+            else if (fcc <= 1200)
+            {
+                fcr = (int)((1200.0 - fcc) * 255.0 / 600.0);
+                fcg = 0;
+                fcb = (int)((fcc - 600.0) * 255.0 / 600.0);
+            }
+            else
+            {
+                fcr = 0;
+                fcg = (int)((fcc - 1200.0) * 255.0 / 600.0);
+                fcb = (int)((1800.0 - fcc) * 255.0 / 600.0);
+            }
+            glColor3ub(fcr, fcg, fcb);
+            glVertex2i(x, y);
+        }
+    glEnd();
 
+    // 中心点描画
+    glBegin(GL_TRIANGLE_FAN);
+        glColor3ub(255, 255, 255);
+        glVertex2i(xc, yc);
+        for (double deg=0; deg<360.0; deg+=0.1)
+        {
+            double rad = M_PI * deg / 180.0;
+            int x = (int)(cos(rad) * 10.0) + xc;
+            int y = (int)(sin(rad) * 10.0) + yc;
             glVertex2i(x, y);
         }
     glEnd();
@@ -84,12 +126,12 @@ void Display(void)
     // 長針描画
     double lr;
     if (xc < yc)
-        lr = (double)xc * 3 / 4;
+        lr = (double)xc * 0.75;
     else
-        lr = (double)yc * 3 / 4;
+        lr = (double)yc * 0.75;
     glLineWidth(2.0);
     glBegin(GL_LINES);
-        glColor3ub(0, 0, 255);
+        glColor3ub(255, 255, 255);
 
         double rad = M_PI * (double)(p_curt -> tm_sec) / 30.0;
         double xe = xc + sin(rad) * lr;
@@ -101,12 +143,12 @@ void Display(void)
 
     // 中針描画
     if (xc < yc)
-        lr = (double)xc / 2;
+        lr = (double)xc * 0.6;
     else
-        lr = (double)yc / 2;
+        lr = (double)yc * 0.6;
     glLineWidth(3.0);
     glBegin(GL_LINES);
-        glColor3ub(0, 255, 0);
+        glColor3ub(255, 255, 255);
 
         rad = M_PI * (double)(p_curt -> tm_min) / 30.0;
         xe = xc + sin(rad) * lr;
@@ -118,14 +160,14 @@ void Display(void)
 
     // 短針描画
     if (xc < yc)
-        lr = (double)xc / 4;
+        lr = (double)xc * 0.5;
     else
-        lr = (double)yc / 4;
+        lr = (double)yc * 0.5;
     glLineWidth(5.0);
     glBegin(GL_LINES);
-        glColor3ub(255, 0, 0);
+        glColor3ub(255, 255, 255);
 
-        rad = M_PI * (double)(p_curt -> tm_hour) / 12.0;
+        rad = M_PI * (double)(p_curt -> tm_hour) / 6.0;
         xe = xc + sin(rad) * lr;
         ye = yc - cos(rad) * lr;
 
